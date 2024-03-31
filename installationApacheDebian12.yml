@@ -1,6 +1,6 @@
 ---
 - name: Installation et configuration d'un serveur web Apache2 sur Debian 12
-  hosts: votre_serveur
+  hosts: jeanmichel
   become: yes
   tasks:
     - name: Mise à jour des packages
