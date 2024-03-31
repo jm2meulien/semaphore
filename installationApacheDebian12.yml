@@ -1,0 +1,44 @@
+---
+- name: Installation et configuration d'un serveur web Apache2 sur Debian 12
+  hosts: votre_serveur
+  become: yes
+  tasks:
+    - name: Mise à jour des packages
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Installation d'Apache2
+      apt:
+        name: apache2
+        state: present
+
+    - name: Activation du module Apache2 rewrite
+      apache2_module:
+        name: rewrite
+        state: present
+
+    - name: Définition du fichier de configuration Apache2
+      template:
+        src: templates/apache2.conf.j2
+        dest: /etc/apache2/apache2.conf
+      notify: Restart Apache2
+
+    - name: Définition du fichier de configuration des virtual hosts
+      template:
+        src: templates/virtual_host.conf.j2
+        dest: /etc/apache2/sites-available/your_website.conf
+      notify: Restart Apache2
+
+    - name: Activation du virtual host
+      file:
+        src: /etc/apache2/sites-available/your_website.conf
+        dest: /etc/apache2/sites-enabled/your_website.conf
+        state: link
+      notify: Restart Apache2
+
+  handlers:
+    - name: Restart Apache2
+      service:
+        name: apache2
+        state: restarted
